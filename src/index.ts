@@ -10,7 +10,7 @@ export const app = new Hono();
 // 验证必要的元数据字段
 function validateMetadata(metadata: any) {
   console.log("metadata", metadata);
-  const requiredFields = ["title", "description", "image"];
+  const requiredFields = ["title", "image"];
   const missingFields = requiredFields.filter((field) => !metadata[field]);
 
   if (missingFields.length > 0) {
@@ -101,7 +101,13 @@ app.post("/api/parse", async (c) => {
 // Add a route to update metadata
 app.post("/api/update", async (c) => {
   const { url, metadata } = await c.req.json();
+
   const isValidMeta = validateMetadata(metadata);
+
+  if (!metadata.description) {
+    metadata.description = "No description";
+  }
+
   if (!isValidMeta) {
     return c.json({ error: "Invalid metadata" }, 400);
   }

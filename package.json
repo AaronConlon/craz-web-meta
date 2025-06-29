@@ -9,8 +9,6 @@
     "test:ui": "vitest --ui",
     "test:coverage": "vitest run --coverage",
     "test:run": "vitest run",
-    "prisma:generate": "prisma generate",
-    "prisma:migrate": "prisma migrate dev",
     "build": "tsc",
     "start": "bun run src/index.ts",
     "typecheck": "tsc --noEmit"
