@@ -4,13 +4,18 @@
   "description": "A web metadata extraction service",
   "scripts": {
     "dev": "bun run --hot src/index.ts",
+    "start": "bun run src/index.ts",
+    "start:pm2": "pm2 start ecosystem.config.js --env production",
+    "stop:pm2": "pm2 stop craz-web-meta",
+    "restart:pm2": "pm2 restart craz-web-meta",
+    "status:pm2": "pm2 status",
+    "logs:pm2": "pm2 logs craz-web-meta",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:ui": "vitest --ui",
     "test:coverage": "vitest run --coverage",
     "test:run": "vitest run",
     "build": "tsc",
-    "start": "bun run src/index.ts",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
