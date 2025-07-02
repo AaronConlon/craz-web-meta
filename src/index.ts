@@ -155,6 +155,16 @@ app.post(
       const now = Math.floor(Date.now() / 1000);
       const ttl = expire_at > now ? expire_at - now : 3600 * 24; // 默认1天
 
+      // 添加调试信息
+      console.log("Creating invite code debug:", {
+        team_id,
+        expire_at,
+        now,
+        ttl,
+        expire_at_formatted: new Date(expire_at * 1000).toISOString(),
+        now_formatted: new Date(now * 1000).toISOString(),
+      });
+
       // 存储邀请码信息到 Redis
       const inviteData = {
         team_id,
@@ -182,6 +192,11 @@ app.post(
           team_id,
           expire_at,
           ttl,
+          debug: {
+            now,
+            expire_at_formatted: new Date(expire_at * 1000).toISOString(),
+            ttl_hours: Math.floor(ttl / 3600),
+          },
         },
       });
     } catch (error) {
@@ -215,11 +230,32 @@ app.post(
 
       // 检查是否已过期
       const now = Math.floor(Date.now() / 1000);
+
+      // 添加调试信息
+      console.log("Invite verification debug:", {
+        invite_code,
+        now,
+        expire_at: invite.expire_at,
+        time_diff: now - invite.expire_at,
+        is_expired: now > invite.expire_at,
+        invite_data: invite,
+      });
+
       if (now > invite.expire_at) {
         // 删除过期的邀请码
         await redis.del(`invite:${invite_code}`);
         await redis.srem(`team:${invite.team_id}:invites`, invite_code);
-        return c.json({ error: "Invite code has expired" }, 400);
+        return c.json(
+          {
+            error: "Invite code has expired",
+            debug: {
+              now,
+              expire_at: invite.expire_at,
+              time_diff: now - invite.expire_at,
+            },
+          },
+          400
+        );
       }
 
       // 检查是否已被使用
@@ -234,6 +270,10 @@ app.post(
           created_at: invite.created_at,
           expire_at: invite.expire_at,
           valid: true,
+          debug: {
+            now,
+            time_remaining: invite.expire_at - now,
+          },
         },
       });
     } catch (error) {

@@ -2,8 +2,8 @@ module.exports = {
   apps: [
     {
       name: 'craz-web-meta',
-      script: 'bun',
-      args: 'run src/index.ts',
+      script: 'src/index.ts',
+      interpreter: 'bun',
       instances: 1,
       autorestart: true,
       watch: false,
@@ -31,4 +31,4 @@ module.exports = {
       time: true
     }
   ]
-}; 
+};
