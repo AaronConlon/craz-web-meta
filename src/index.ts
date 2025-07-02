@@ -151,8 +151,8 @@ app.post(
       // 生成邀请码
       const inviteCode = generateInviteCode();
 
-      // 计算过期时间（秒）
-      const now = Math.floor(Date.now() / 1000);
+      // 统一使用毫秒级时间戳
+      const now = Date.now();
 
       // 如果传入的过期时间已经过期，直接返回错误
       if (expire_at <= now) {
@@ -163,15 +163,15 @@ app.post(
               now,
               expire_at,
               time_diff: now - expire_at,
-              expire_at_formatted: new Date(expire_at * 1000).toISOString(),
-              now_formatted: new Date(now * 1000).toISOString(),
+              expire_at_formatted: new Date(expire_at).toISOString(),
+              now_formatted: new Date(now).toISOString(),
             },
           },
           400
         );
       }
 
-      const ttl = expire_at - now;
+      const ttl = Math.floor((expire_at - now) / 1000); // 转换为秒用于Redis TTL
 
       // 添加调试信息
       console.log("Creating invite code debug:", {
@@ -179,14 +179,14 @@ app.post(
         expire_at,
         now,
         ttl,
-        expire_at_formatted: new Date(expire_at * 1000).toISOString(),
-        now_formatted: new Date(now * 1000).toISOString(),
+        expire_at_formatted: new Date(expire_at).toISOString(),
+        now_formatted: new Date(now).toISOString(),
       });
 
       // 存储邀请码信息到 Redis
       const inviteData = {
         team_id,
-        created_at: now,
+        created_at: Math.floor(now / 1000), // 存储秒级时间戳
         expire_at,
         used: false,
         used_by: null,
@@ -212,7 +212,7 @@ app.post(
           ttl,
           debug: {
             now,
-            expire_at_formatted: new Date(expire_at * 1000).toISOString(),
+            expire_at_formatted: new Date(expire_at).toISOString(),
             ttl_hours: Math.floor(ttl / 3600),
           },
         },
@@ -247,7 +247,7 @@ app.post(
       const invite = JSON.parse(inviteData);
 
       // 检查是否已过期
-      const now = Math.floor(Date.now() / 1000);
+      const now = Date.now();
 
       // 添加调试信息
       console.log("Invite verification debug:", {
@@ -325,7 +325,7 @@ app.post(
       const invite = JSON.parse(inviteData);
 
       // 检查是否已过期
-      const now = Math.floor(Date.now() / 1000);
+      const now = Date.now();
 
       // 添加调试信息
       console.log("Using invite code debug:", {
@@ -362,10 +362,10 @@ app.post(
       // 标记邀请码为已使用
       invite.used = true;
       invite.used_by = user_id;
-      invite.used_at = now;
+      invite.used_at = Math.floor(now / 1000); // 存储秒级时间戳
 
       // 更新 Redis 中的邀请码信息
-      const ttl = invite.expire_at - now;
+      const ttl = Math.floor((invite.expire_at - now) / 1000); // 转换为秒用于Redis TTL
       if (ttl > 0) {
         await redis.setex(`invite:${invite_code}`, ttl, JSON.stringify(invite));
       }
@@ -378,7 +378,7 @@ app.post(
         data: {
           team_id: invite.team_id,
           user_id,
-          joined_at: now,
+          joined_at: Math.floor(now / 1000), // 返回秒级时间戳
         },
       });
     } catch (error) {
