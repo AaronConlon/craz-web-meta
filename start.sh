@@ -2,7 +2,7 @@
 
 # 启动 PM2 进程
 echo "Starting craz-web-meta with PM2..."
-pm2 start ecosystem.config.js --env production
+pm2 start ecosystem.config.cjs --env production
 
 # 保存 PM2 配置
 pm2 save
