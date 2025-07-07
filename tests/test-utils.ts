@@ -10,7 +10,16 @@ type FetchOptions = {
 export function createTestApp() {
   return {
     async fetch(input: string | URL | Request, init: FetchOptions = {}) {
-      const url = typeof input === 'string' ? input : input instanceof URL ? input.toString() : input.url;
+      let url: string;
+      
+      if (typeof input === 'string') {
+        // 如果是相对路径，添加基础 URL
+        url = input.startsWith('/') ? `http://localhost${input}` : input;
+      } else if (input instanceof URL) {
+        url = input.toString();
+      } else {
+        url = input.url;
+      }
       
       const requestInit: RequestInit = {
         method: init.method || 'GET',

@@ -18,6 +18,8 @@ export default defineConfig({
       exclude: ["**/*.test.ts", "**/*.d.ts", "**/index.ts"],
     },
     env: {
+      NODE_ENV: "test",
+      VITEST: "true",
       SECRET_TOKEN: "test-token",
       REDIS_HOST: "localhost",
       REDIS_PORT: "6379",

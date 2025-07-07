@@ -79,6 +79,7 @@ describe("API Endpoints", () => {
       url: testUrl,
       title: "Cached Title",
       description: "Cached Description",
+      image: "https://example.com/image.jpg",
       cachedAt: new Date().toISOString(),
     };
 
@@ -109,7 +110,7 @@ describe("API Endpoints", () => {
     expect(mockExtractMetadata).not.toHaveBeenCalled();
   });
 
-  it("POST /api/parse -> should return 400 for invalid URL", async () => {
+  it("POST /api/parse -> should return 200 with error for invalid URL", async () => {
     const req = new Request("http://localhost/api/parse", {
       method: "POST",
       headers: {
@@ -120,9 +121,12 @@ describe("API Endpoints", () => {
     });
 
     const res = await app.fetch(req);
-    expect(res.status).toBe(400);
+    expect(res.status).toBe(200);
 
     const body = await res.json();
-    expect(body).toHaveProperty("error", "Invalid URL");
+    expect(body).toHaveProperty("success", false);
+    expect(body).toHaveProperty("error");
+    expect(body.error).toHaveProperty("code", "METADATA_INVALID_URL");
+    expect(body.error).toHaveProperty("message", "无效的URL");
   });
 });

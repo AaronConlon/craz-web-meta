@@ -14,9 +14,12 @@
     "test:watch": "vitest",
     "test:ui": "vitest --ui",
     "test:coverage": "vitest run --coverage",
-    "test:run": "vitest run",
+    "test:integration": "vitest run tests/",
+    "test:invite": "vitest run tests/invite.test.ts",
+    "test:unit": "vitest run tests/unit/",
     "build": "tsc",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "lint": "tsc --noEmit"
   },
   "dependencies": {
     "@hono/zod-validator": "^0.7.0",
