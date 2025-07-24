@@ -46,9 +46,9 @@ inviteRouter.post(
 
       // 统一使用毫秒级时间戳
       const now = Date.now();
-
       // 如果传入的过期时间已经过期，直接返回错误
       if (expire_at <= now) {
+        console.log("Expire time is past");
         return sendError(
           c,
           ERROR_CODES.INVITE_CODE_EXPIRE_TIME_PAST,
